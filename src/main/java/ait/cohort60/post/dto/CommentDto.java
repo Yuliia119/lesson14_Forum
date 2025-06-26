@@ -1,5 +1,6 @@
 package ait.cohort60.post.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,8 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class CommentDto {   // ответ на добавление коментария
-    private String user;
+    @JsonProperty("user")
+    private String username;
     private String message;
     private LocalDateTime dateCreated;
     private Long likes;
