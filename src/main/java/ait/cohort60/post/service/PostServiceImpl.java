@@ -43,19 +43,21 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+
     public PostDto findPostById(Long id) {
         Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
         return modelMapper.map(post, PostDto.class);
     }
 
     @Override
-    @Transactional
+    @Transactional  // выполнит метод до конца и connect не оборвёться
     public void addLikes(Long id) {
         Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
         post.addLikes();
     }
 
     @Override
+    @Transactional
     public PostDto updatePost(Long id, NewPostDto newPostDto) {
         Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
         post.setTitle(newPostDto.getTitle());
@@ -79,6 +81,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public PostDto addComment(Long id, String author, NewCommentDto newCommentDto) {
         Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
         Comment comment = new Comment(author, newCommentDto.getMessage());
@@ -88,17 +91,26 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Iterable<PostDto> findPostsByAuthor(String author) {
-        return null;
+        return postRepository.findByAuthorIgnoreCase(author)
+                .map (post -> modelMapper.map(post, PostDto.class))
+                .toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Iterable<PostDto> findPostsByTags(List<String> tags) {
-        return null;
+        return postRepository.findDistinctByTagsNameInIgnoreCase(tags)
+                .map (post -> modelMapper.map(post, PostDto.class))
+                .toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Iterable<PostDto> findPostsByPeriod(LocalDateTime start, LocalDateTime end) {
-        return null;
+        return postRepository.findByDateCreatedBetween(start, end)
+                .map (post -> modelMapper.map(post, PostDto.class))
+                .toList();
     }
 }

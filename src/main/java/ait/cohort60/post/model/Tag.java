@@ -15,6 +15,7 @@ import java.util.Set;
 @Table(name = "tags")
 public class Tag {
     @Id
+    @Column(name = "name")
     private String name;
     @ManyToMany(mappedBy = "tags")
     private Set<Post> posts=  new HashSet<>();
