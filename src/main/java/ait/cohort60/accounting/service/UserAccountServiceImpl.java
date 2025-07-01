@@ -8,18 +8,22 @@ import ait.cohort60.accounting.dto.UserRegisterDto;
 import ait.cohort60.accounting.dto.exception.InvalidDataException;
 import ait.cohort60.accounting.dto.exception.UserExistsException;
 import ait.cohort60.accounting.dto.exception.UserNotFoundException;
+import ait.cohort60.accounting.model.Role;
 import ait.cohort60.accounting.model.UserAccount;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
 
 @Service
 @RequiredArgsConstructor
-public class UserAccountServiceImpl implements  UserAccountService {
+public class UserAccountServiceImpl implements  UserAccountService, CommandLineRunner {
     private final UserAccountRepository userAccountRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -29,6 +33,8 @@ public class UserAccountServiceImpl implements  UserAccountService {
         }
         UserAccount  userAccount = modelMapper.map(userRegisterDto,UserAccount.class);
         userAccount.addRole("USER");
+        String encodedPassword = passwordEncoder.encode(userRegisterDto.getPassword());
+        userAccount.setPassword(encodedPassword);
         userAccountRepository.save(userAccount);
         return modelMapper.map(userAccount,UserDto.class);
     }
@@ -81,5 +87,21 @@ public class UserAccountServiceImpl implements  UserAccountService {
         UserAccount userAccount = userAccountRepository.findById(login).orElseThrow(UserNotFoundException::new);
         userAccount.setPassword(newPassword);
         userAccountRepository.save(userAccount);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        if (userAccountRepository.existsById("admin")) {
+            UserAccount admin = UserAccount.builder()
+                    .login("admin")
+                    .password(passwordEncoder.encode("admin"))
+                    .firstName("Admin")
+                    .lastName("Admin")
+                    .role(Role.USER)
+                    .role(Role.MODERATOR)
+                    .role(Role.ADMINISTRATOR)
+                    .build();
+            userAccountRepository.save(admin);
+        }
     }
 }

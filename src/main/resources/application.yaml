@@ -12,5 +12,3 @@ spring:
   data:
     mongodb:
       uri: ${MONGO_URI}
-  liquibase:
-    enabled: false
