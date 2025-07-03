@@ -1,9 +1,6 @@
 package ait.cohort60.accounting.controller;
 
-import ait.cohort60.accounting.dto.RolesDto;
-import ait.cohort60.accounting.dto.UserDto;
-import ait.cohort60.accounting.dto.UserEditDto;
-import ait.cohort60.accounting.dto.UserRegisterDto;
+import ait.cohort60.accounting.dto.*;
 import ait.cohort60.accounting.service.UserAccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,5 +54,10 @@ public class UserAccountController {
     @GetMapping("/user/{login}")
     public UserDto getUser(@PathVariable String login) {
         return userAccountService.getUser(login);
+    }
+
+    @GetMapping("/email")
+    public void sendEmail(@RequestBody @Valid EmailDto emailDto) {
+        userAccountService.sendEmail(emailDto);
     }
 }

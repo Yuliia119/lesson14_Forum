@@ -1,10 +1,7 @@
 package ait.cohort60.accounting.service;
 
 import ait.cohort60.accounting.dao.UserAccountRepository;
-import ait.cohort60.accounting.dto.RolesDto;
-import ait.cohort60.accounting.dto.UserDto;
-import ait.cohort60.accounting.dto.UserEditDto;
-import ait.cohort60.accounting.dto.UserRegisterDto;
+import ait.cohort60.accounting.dto.*;
 import ait.cohort60.accounting.dto.exception.InvalidDataException;
 import ait.cohort60.accounting.dto.exception.UserExistsException;
 import ait.cohort60.accounting.dto.exception.UserNotFoundException;
@@ -13,6 +10,8 @@ import ait.cohort60.accounting.model.UserAccount;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +23,7 @@ public class UserAccountServiceImpl implements  UserAccountService, CommandLineR
     private final UserAccountRepository userAccountRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender mailSender;
 
 
     @Override
@@ -87,6 +87,15 @@ public class UserAccountServiceImpl implements  UserAccountService, CommandLineR
         UserAccount userAccount = userAccountRepository.findById(login).orElseThrow(UserNotFoundException::new);
         userAccount.setPassword(newPassword);
         userAccountRepository.save(userAccount);
+    }
+
+    @Override
+    public void sendEmail(EmailDto emailDto){
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(emailDto.getTo());
+        message.setSubject(emailDto.getSubject());
+        message.setText(emailDto.getMessage());
+        mailSender.send(message);
     }
 
     @Override

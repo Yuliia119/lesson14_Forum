@@ -119,4 +119,5 @@ public class PostServiceImpl implements PostService {
                 .map (post -> modelMapper.map(post, PostDto.class))
                 .toList();
     }
+
 }
